@@ -1,8 +1,9 @@
 from flask import Flask, request, render_template, redirect
 import joblib
 import pandas as pd
-import sqlite3
 import os
+import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -10,22 +11,22 @@ app = Flask(__name__)
 model = joblib.load("model.pkl")
 encoders = joblib.load("encoders.pkl")
 
-# Initialize SQLite DB
-DB_FILE = "predictions.db"
+# Initialize DB if not exists
 def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS predictions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    director TEXT,
-                    actor TEXT,
-                    genre TEXT,
-                    year INTEGER,
-                    predicted_rating REAL
-                )''')
+    conn = sqlite3.connect("predictions.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS predictions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            actor_name TEXT,
+            predicted_rating REAL,
+            timestamp TEXT
+        )
+    """)
     conn.commit()
     conn.close()
+
 init_db()
 
 @app.route("/")
@@ -34,47 +35,44 @@ def index():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    # Get and clean inputs
-    title = request.form["movie_title"].strip().lower()
-    director = request.form["director_name"].strip().lower()
-    actor = request.form["actor_name"].strip().lower()
-    genre = request.form["genre"].strip().lower()
-    year = int(request.form["release_year"])
+    title = request.form["movie_title"]
+    actor = request.form["actor_name"]
 
-    # Encode categorical fields
-    def safe_encode(encoder, value):
-        value = value.lower()
-        return encoder.transform([value])[0] if value in encoder.classes_ else 0
+    # Case-insensitive encoder transform
+    def safe_transform(field, value):
+        value = value.lower().strip()
+        encoder = encoders[field]
+        classes = [cls.lower() for cls in encoder.classes_]
+        if value in classes:
+            return encoder.transform([encoder.classes_[classes.index(value)]])[0]
+        return 0  # Default if not found
 
     input_data = {
         "movie_title": title,
-        "director_name": safe_encode(encoders["director_name"], director),
-        "actor_1_name": safe_encode(encoders["actor_1_name"], actor),
-        "genres": safe_encode(encoders["genres"], genre),
-        "title_year": year
+        "actor_1_name": safe_transform("actor_1_name", actor)
     }
 
     df = pd.DataFrame([input_data])
-    predicted_rating = model.predict(df)[0]
+    prediction = model.predict(df)[0]
 
-    # Save to DB
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("INSERT INTO predictions (title, director, actor, genre, year, predicted_rating) VALUES (?, ?, ?, ?, ?, ?)",
-              (title, director, actor, genre, year, predicted_rating))
+    # Save to database
+    conn = sqlite3.connect("predictions.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO predictions (title, actor_name, predicted_rating, timestamp)
+        VALUES (?, ?, ?, ?)
+    """, (title, actor, prediction, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     conn.commit()
     conn.close()
 
-    return render_template("index.html", prediction=f"Predicted Rating: {predicted_rating:.2f}")
+    return render_template("index.html", prediction=f"{prediction:.2f}")
 
 @app.route("/dashboard")
 def dashboard():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT * FROM predictions ORDER BY id DESC")
-    rows = c.fetchall()
+    conn = sqlite3.connect("predictions.db")
+    df = pd.read_sql_query("SELECT * FROM predictions ORDER BY timestamp DESC", conn)
     conn.close()
-    return render_template("dashboard.html", rows=rows)
+    return render_template("dashboard.html", data=df.to_dict(orient="records"))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
