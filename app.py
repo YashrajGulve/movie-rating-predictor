@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 import joblib
 import pandas as pd
+import os  # ✅ Add this line
 
 app = Flask(__name__)
 
