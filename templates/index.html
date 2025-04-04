@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Rating Predictor</title>
+</head>
+<body>
+    <h1>Movie Rating Predictor 🎬</h1>
+    <form method="POST" action="/predict">
+        <label>Director Name:</label><br>
+        <input type="text" name="director_name"><br>
+
+        <label>Actor 1 Name:</label><br>
+        <input type="text" name="actor_1_name"><br>
+
+        <label>Actor 2 Name:</label><br>
+        <input type="text" name="actor_2_name"><br>
+
+        <label>Actor 3 Name:</label><br>
+        <input type="text" name="actor_3_name"><br>
+
+        <label>Genres:</label><br>
+        <input type="text" name="genres"><br>
+
+        <label>Duration (mins):</label><br>
+        <input type="text" name="duration"><br>
+
+        <label>Budget ($):</label><br>
+        <input type="text" name="budget"><br>
+
+        <label>Release Year:</label><br>
+        <input type="text" name="title_year"><br><br>
+
+        <input type="submit" value="Predict Rating">
+    </form>
+
+    {% if prediction %}
+        <h2>Predicted IMDb Rating: {{ prediction }}</h2>
+    {% endif %}
+</body>
+</html>
