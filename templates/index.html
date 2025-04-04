@@ -1,52 +1,104 @@
-!-- index.html --
-!DOCTYPE html
-html lang=en
-head
-    meta charset=UTF-8
-    meta name=viewport content=width=device-width, initial-scale=1.0
-    titleOscar-Themed Movie Rating Predictortitle
-    style
-        body {
-            background-color black;
-            color gold;
-            font-family 'Arial', sans-serif;
-            text-align center;
-        }
-        h1 {
-            font-size 2.5rem;
-            margin-top 20px;
-        }
-        form {
-            background rgba(255, 215, 0, 0.2);
-            padding 20px;
-            border-radius 10px;
-            display inline-block;
-            margin-top 20px;
-        }
-        input, button {
-            padding 10px;
-            margin 10px;
-            border-radius 5px;
-            border none;
-        }
-        button {
-            background-color gold;
-            color black;
-            cursor pointer;
-        }
-    style
-head
-body
-    h1🎬 Oscar-Themed Movie Rating Predictor 🎭h1
-    form action=predict method=post
-        input type=text name=movie_title placeholder=Enter Movie Title requiredbr
-        input type=text name=actor_name placeholder=Enter Actor Name requiredbr
-        button type=submitPredict Ratingbutton
-    form
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎥 Movie Rating Predictor</title>
+  <style>
+    body {
+      background-color: #121212;
+      font-family: 'Segoe UI', sans-serif;
+      color: #f1c40f;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 80px auto;
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+      animation: fadeIn 1s ease-in-out;
+    }
+    h1 {
+      text-align: center;
+      color: #f1c40f;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 15px 0 5px;
+    }
+    input[type="text"], button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    input[type="text"] {
+      background: #2c2c2c;
+      color: #fff;
+    }
+    input[type="text"]:focus {
+      outline: 2px solid #f1c40f;
+    }
+    button {
+      background-color: #f1c40f;
+      color: #121212;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #d4ac0d;
+    }
+    .prediction {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 20px;
+      color: #fff;
+    }
+    .dashboard-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #f1c40f;
+      text-decoration: none;
+    }
+    .dashboard-link:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎬 Movie Predictor</h1>
+    <form method="POST" action="/predict">
+      <label for="movie_title">🎞️ Movie Title</label>
+      <input type="text" id="movie_title" name="movie_title" placeholder="e.g. Inception" required />
+
+      <label for="actor_name">👤 Lead Actor Name</label>
+      <input type="text" id="actor_name" name="actor_name" placeholder="e.g. Leonardo DiCaprio" required />
+
+      <button type="submit">Predict Rating</button>
+    </form>
+
     {% if prediction %}
-        h2Predicted Rating {{ prediction }}h2
+      <div class="prediction">
+        ⭐ Predicted IMDb Rating: <strong>{{ prediction }}</strong>
+      </div>
     {% endif %}
-    br
-    a href=dashboard style=color gold; text-decoration none;View Prediction Dashboarda
-body
-html
+
+    <a href="/dashboard" class="dashboard-link">📊 View Dashboard</a>
+  </div>
+</body>
+</html>

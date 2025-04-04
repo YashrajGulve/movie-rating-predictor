@@ -1,51 +1,74 @@
-<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Dashboard</title>
-    <style>
-        body {
-            background-color: black;
-            color: gold;
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-        }
-        table {
-            width: 80%;
-            margin: auto;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid gold;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: darkgoldenrod;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📊 Prediction Dashboard</title>
+  <style>
+    body {
+      background-color: #121212;
+      font-family: 'Segoe UI', sans-serif;
+      color: #f1c40f;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #f1c40f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+    th {
+      background-color: #1c1c1c;
+      color: #f1c40f;
+    }
+    tr:nth-child(even) {
+      background-color: #1e1e1e;
+    }
+    tr:hover {
+      background-color: #292929;
+    }
+    .back-link {
+      text-align: center;
+      display: block;
+      margin-top: 30px;
+      color: #f1c40f;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <h1>🎭 Prediction Dashboard 🎬</h1>
-    <table>
+  <h1>🎬 Prediction Dashboard</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>🎞️ Movie Title</th>
+        <th>👤 Actor Name</th>
+        <th>⭐ Predicted Rating</th>
+        <th>🕒 Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
         <tr>
-            <th>Movie Title</th>
-            <th>Actor Name</th>
-            <th>Predicted Rating</th>
-            <th>Timestamp</th>
+          <td>{{ row.title }}</td>
+          <td>{{ row.actor_name }}</td>
+          <td>{{ row.predicted_rating }}</td>
+          <td>{{ row.timestamp }}</td>
         </tr>
-        {% for entry in data %}
-        <tr>
-            <td>{{ entry['title'] }}</td>
-            <td>{{ entry['actor_name'] }}</td>
-            <td>{{ entry['predicted_rating'] }}</td>
-            <td>{{ entry['timestamp'] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <br>
-    <a href="/" style="color: gold; text-decoration: none;">Back to Prediction</a>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="/" class="back-link">⬅ Back to Prediction</a>
 </body>
 </html>
