@@ -1,59 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oscar-Worthy Movie Rating Predictor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="slideshow-container">
-        <div class="slide fade"><img src="{{ url_for('static', filename='images/movie1.jpg') }}" alt="Movie 1"></div>
-        <div class="slide fade"><img src="{{ url_for('static', filename='images/movie2.jpg') }}" alt="Movie 2"></div>
-        <div class="slide fade"><img src="{{ url_for('static', filename='images/movie3.jpg') }}" alt="Movie 3"></div>
-    </div>
-
-    <div class="form-container">
-        <h1>🎬 Movie Rating Predictor</h1>
-        <form action="/predict" method="POST" onsubmit="return validateForm()">
-            <label for="movie_title">Movie Title:</label>
-            <input type="text" id="movie_title" name="movie_title" required>
-
-            <label for="actor_name">Lead Actor Name:</label>
-            <input type="text" id="actor_name" name="actor_name" required>
-
-            <button type="submit">Predict Rating</button>
-        </form>
-
-        {% if prediction %}
-            <h2>Predicted Rating: ⭐ {{ prediction }}</h2>
-        {% endif %}
-    </div>
-
-    <script>
-        function validateForm() {
-            let movieTitle = document.getElementById("movie_title").value.trim();
-            let actorName = document.getElementById("actor_name").value.trim();
-
-            if (!movieTitle || !actorName) {
-                alert("Please fill in all fields!");
-                return false;
-            }
-            return true;
+!-- index.html --
+!DOCTYPE html
+html lang=en
+head
+    meta charset=UTF-8
+    meta name=viewport content=width=device-width, initial-scale=1.0
+    titleOscar-Themed Movie Rating Predictortitle
+    style
+        body {
+            background-color black;
+            color gold;
+            font-family 'Arial', sans-serif;
+            text-align center;
         }
-
-        let slideIndex = 0;
-        function showSlides() {
-            let slides = document.getElementsByClassName("slide");
-            for (let i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-            }
-            slideIndex++;
-            if (slideIndex > slides.length) slideIndex = 1;
-            slides[slideIndex - 1].style.display = "block";
-            setTimeout(showSlides, 3000);
+        h1 {
+            font-size 2.5rem;
+            margin-top 20px;
         }
-        showSlides();
-    </script>
-</body>
-</html>
+        form {
+            background rgba(255, 215, 0, 0.2);
+            padding 20px;
+            border-radius 10px;
+            display inline-block;
+            margin-top 20px;
+        }
+        input, button {
+            padding 10px;
+            margin 10px;
+            border-radius 5px;
+            border none;
+        }
+        button {
+            background-color gold;
+            color black;
+            cursor pointer;
+        }
+    style
+head
+body
+    h1🎬 Oscar-Themed Movie Rating Predictor 🎭h1
+    form action=predict method=post
+        input type=text name=movie_title placeholder=Enter Movie Title requiredbr
+        input type=text name=actor_name placeholder=Enter Actor Name requiredbr
+        button type=submitPredict Ratingbutton
+    form
+    {% if prediction %}
+        h2Predicted Rating {{ prediction }}h2
+    {% endif %}
+    br
+    a href=dashboard style=color gold; text-decoration none;View Prediction Dashboarda
+body
+html

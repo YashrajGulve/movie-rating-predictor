@@ -1,34 +1,51 @@
+<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prediction Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: black;
+            color: gold;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid gold;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: darkgoldenrod;
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>📊 Prediction Log Dashboard</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Movie Title</th>
-                    <th>Actor Name</th>
-                    <th>Predicted Rating</th>
-                    <th>Timestamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in logs %}
-                <tr>
-                    <td>{{ entry.movie_title }}</td>
-                    <td>{{ entry.actor_name }}</td>
-                    <td>⭐ {{ entry.predicted_rating }}</td>
-                    <td>{{ entry.timestamp }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <h1>🎭 Prediction Dashboard 🎬</h1>
+    <table>
+        <tr>
+            <th>Movie Title</th>
+            <th>Actor Name</th>
+            <th>Predicted Rating</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for entry in data %}
+        <tr>
+            <td>{{ entry['title'] }}</td>
+            <td>{{ entry['actor_name'] }}</td>
+            <td>{{ entry['predicted_rating'] }}</td>
+            <td>{{ entry['timestamp'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="/" style="color: gold; text-decoration: none;">Back to Prediction</a>
 </body>
 </html>
