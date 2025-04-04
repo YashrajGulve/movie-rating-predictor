@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+            padding: 30px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #333;
+        }
+        th, td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎥 Movie Rating Predictions Log</h1>
+    <table>
+        <tr>
+            <th>Movie Title</th>
+            <th>Actor</th>
+            <th>Director</th>
+            <th>Genre</th>
+            <th>Year</th>
+            <th>Predicted Rating</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for row in logs %}
+        <tr>
+            <td>{{ row['movie_title'] }}</td>
+            <td>{{ row['actor_name'] }}</td>
+            <td>{{ row['director_name'] }}</td>
+            <td>{{ row['genre'] }}</td>
+            <td>{{ row['release_year'] }}</td>
+            <td>{{ row['predicted_rating'] }}</td>
+            <td>{{ row['timestamp'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

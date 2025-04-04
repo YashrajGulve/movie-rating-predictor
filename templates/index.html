@@ -1,128 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🎬 Oscar Entry: Movie Rating Predictor</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('https://images.unsplash.com/photo-1605647533966-5f8b65f0f1bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
-      background-size: cover;
-      backdrop-filter: blur(4px);
-      color: #fff;
-    }
-
-    .overlay {
-      background-color: rgba(0, 0, 0, 0.7);
-      min-height: 100vh;
-      padding: 40px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    h1 {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px 30px;
-      border-radius: 15px;
-      font-size: 2.2rem;
-      text-align: center;
-    }
-
-    form {
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-      display: flex;
-      flex-direction: column;
-      width: 300px;
-      animation: fadeIn 1.2s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input {
-      margin-top: 5px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      font-size: 1em;
-    }
-
-    button {
-      margin-top: 15px;
-      padding: 10px;
-      border: none;
-      border-radius: 10px;
-      background-color: #ffcc00;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #e6b800;
-    }
-
-    .result {
-      margin-top: 20px;
-      background: rgba(0,0,0,0.6);
-      padding: 15px 25px;
-      border-radius: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Movie Rating Predictor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url("https://wallpaperaccess.com/full/32662.jpg");
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .form-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            animation: fadeIn 1s ease-in-out;
+        }
+        input, select {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: gold;
+            color: black;
+            cursor: pointer;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .prediction {
+            margin-top: 20px;
+            font-size: 22px;
+            color: lightgreen;
+        }
+    </style>
 </head>
 <body>
-  <div class="overlay">
-    <h1>🏆 Oscar Entry: Rate Your Movie</h1>
-    <form method="POST" action="/predict" onsubmit="return validateForm()">
-      <label for="director_name">🎬 Director Name:</label>
-      <input type="text" name="director_name" placeholder="e.g. Christopher Nolan" required minlength="2">
-
-      <label for="actor_1_name">🌟 Lead Actor:</label>
-      <input type="text" name="actor_1_name" placeholder="e.g. Leonardo DiCaprio" required minlength="2">
-
-      <label for="movie_title">🎞️ Movie Title:</label>
-      <input type="text" name="movie_title" placeholder="e.g. Inception" required minlength="1">
-
-      <label for="title_year">📅 Release Year:</label>
-      <input type="number" name="title_year" placeholder="e.g. 2010" required min="1900" max="2025">
-
-      <label for="genres">🎭 Genre:</label>
-      <input type="text" name="genres" placeholder="e.g. Action|Sci-Fi" required pattern="[A-Za-z|]+" title="Only letters and '|' allowed. Example: Action|Drama">
-
-      <button type="submit">🎯 Predict Rating</button>
-    </form>
-
-    {% if prediction %}
-      <div class="result">
-        <h3>🎉 Predicted IMDB Rating: {{ prediction }}</h3>
-      </div>
-    {% endif %}
-  </div>
-
-  <script>
-    function validateForm() {
-      const year = document.querySelector('input[name="title_year"]').value;
-      if (year < 1900 || year > new Date().getFullYear()) {
-        alert("Please enter a valid release year.");
-        return false;
-      }
-      return true;
-    }
-  </script>
+    <div class="form-container">
+        <h1>🎬 Movie Rating Predictor</h1>
+        <form action="/predict" method="post">
+            <input type="text" name="movie_title" placeholder="Movie Title" required><br>
+            <input type="text" name="actor_name" placeholder="Lead Actor Name" required><br>
+            <input type="text" name="director_name" placeholder="Director Name" required><br>
+            <input type="text" name="genre" placeholder="Genre (e.g. Action, Drama)" required><br>
+            <input type="number" name="release_year" placeholder="Release Year" min="1900" max="2025" required><br>
+            <input type="submit" value="Predict Rating">
+        </form>
+        {% if prediction %}
+            <div class="prediction">
+                ⭐ Predicted Rating: {{ prediction }}
+            </div>
+        {% endif %}
+        <br>
+        <a href="/dashboard" style="color: gold;">View Prediction Dashboard</a>
+    </div>
 </body>
 </html>

@@ -1,25 +1,32 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 import joblib
 import pandas as pd
-import csv
+import sqlite3
 import os
-from datetime import datetime
 
 app = Flask(__name__)
 
+# Load model and encoders
 model = joblib.load("model.pkl")
 encoders = joblib.load("encoders.pkl")
 
-def log_prediction(input_data, prediction):
-    log_data = input_data.copy()
-    log_data["prediction"] = prediction
-    log_data["timestamp"] = datetime.now().isoformat()
-
-    with open("prediction_log.csv", mode="a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=log_data.keys())
-        if f.tell() == 0:
-            writer.writeheader()
-        writer.writerow(log_data)
+# Initialize SQLite DB
+DB_FILE = "predictions.db"
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS predictions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT,
+                    director TEXT,
+                    actor TEXT,
+                    genre TEXT,
+                    year INTEGER,
+                    predicted_rating REAL
+                )''')
+    conn.commit()
+    conn.close()
+init_db()
 
 @app.route("/")
 def index():
@@ -27,26 +34,47 @@ def index():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    input_data = {
-        "director_name": request.form["director_name"],
-        "actor_1_name": request.form["actor_1_name"],
-        "movie_title": request.form["movie_title"],
-        "title_year": int(request.form["title_year"]),
-        "genres": request.form["genres"]
-    }
+    # Get and clean inputs
+    title = request.form["movie_title"].strip().lower()
+    director = request.form["director_name"].strip().lower()
+    actor = request.form["actor_name"].strip().lower()
+    genre = request.form["genre"].strip().lower()
+    year = int(request.form["release_year"])
 
     # Encode categorical fields
-    for field in ["director_name", "actor_1_name", "movie_title", "genres"]:
-        encoder = encoders.get(field)
-        value = input_data[field]
-        input_data[field] = encoder.transform([value])[0] if value in encoder.classes_ else 0
+    def safe_encode(encoder, value):
+        value = value.lower()
+        return encoder.transform([value])[0] if value in encoder.classes_ else 0
+
+    input_data = {
+        "movie_title": title,
+        "director_name": safe_encode(encoders["director_name"], director),
+        "actor_1_name": safe_encode(encoders["actor_1_name"], actor),
+        "genres": safe_encode(encoders["genres"], genre),
+        "title_year": year
+    }
 
     df = pd.DataFrame([input_data])
-    prediction = model.predict(df)[0]
+    predicted_rating = model.predict(df)[0]
 
-    log_prediction(input_data, prediction)
+    # Save to DB
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("INSERT INTO predictions (title, director, actor, genre, year, predicted_rating) VALUES (?, ?, ?, ?, ?, ?)",
+              (title, director, actor, genre, year, predicted_rating))
+    conn.commit()
+    conn.close()
 
-    return render_template("index.html", prediction=f"{prediction:.2f}")
+    return render_template("index.html", prediction=f"Predicted Rating: {predicted_rating:.2f}")
+
+@app.route("/dashboard")
+def dashboard():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT * FROM predictions ORDER BY id DESC")
+    rows = c.fetchall()
+    conn.close()
+    return render_template("dashboard.html", rows=rows)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
