@@ -1,13 +1,25 @@
 from flask import Flask, request, render_template
 import joblib
 import pandas as pd
-import os  # ✅ Add this line
+import csv
+import os
+from datetime import datetime
 
 app = Flask(__name__)
 
-# Load model and encoders
 model = joblib.load("model.pkl")
 encoders = joblib.load("encoders.pkl")
+
+def log_prediction(input_data, prediction):
+    log_data = input_data.copy()
+    log_data["prediction"] = prediction
+    log_data["timestamp"] = datetime.now().isoformat()
+
+    with open("prediction_log.csv", mode="a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=log_data.keys())
+        if f.tell() == 0:
+            writer.writeheader()
+        writer.writerow(log_data)
 
 @app.route("/")
 def index():
@@ -18,24 +30,23 @@ def predict():
     input_data = {
         "director_name": request.form["director_name"],
         "actor_1_name": request.form["actor_1_name"],
-        "actor_2_name": request.form["actor_2_name"],
-        "actor_3_name": request.form["actor_3_name"],
-        "genres": request.form["genres"],
-        "duration": float(request.form["duration"]),
-        "budget": float(request.form["budget"]),
+        "movie_title": request.form["movie_title"],
         "title_year": int(request.form["title_year"]),
+        "genres": request.form["genres"]
     }
 
-    for field in ["director_name", "actor_1_name", "actor_2_name", "actor_3_name", "genres"]:
-        encoder = encoders[field]
+    # Encode categorical fields
+    for field in ["director_name", "actor_1_name", "movie_title", "genres"]:
+        encoder = encoders.get(field)
         value = input_data[field]
         input_data[field] = encoder.transform([value])[0] if value in encoder.classes_ else 0
 
     df = pd.DataFrame([input_data])
     prediction = model.predict(df)[0]
-    return render_template("index.html", prediction=f"{prediction:.2f}")
 
-    import os
+    log_prediction(input_data, prediction)
+
+    return render_template("index.html", prediction=f"{prediction:.2f}")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
