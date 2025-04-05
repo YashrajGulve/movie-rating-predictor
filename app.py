@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template
 import joblib
 import pandas as pd
 import os
@@ -11,16 +11,17 @@ app = Flask(__name__)
 model = joblib.load("model.pkl")
 encoders = joblib.load("encoders.pkl")
 
-# Initialize DB if not exists
+# Initialize DB
 def init_db():
     conn = sqlite3.connect("predictions.db")
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS predictions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            movie_title TEXT,
             actor_name TEXT,
-            genres TEXT,
-            title_year INTEGER,
+            genre TEXT,
+            year TEXT,
             predicted_rating REAL,
             timestamp TEXT
         )
@@ -36,35 +37,37 @@ def index():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    title = request.form["movie_title"]
     actor = request.form["actor_name"]
-    genre = request.form["genres"]
+    genre = request.form["genre"]
     year = request.form["title_year"]
 
-    # Case-insensitive encoder transform
-    def safe_transform(field, value):
+    # Case-insensitive encoding
+    def safe_encode(field, value):
         value = value.lower().strip()
         encoder = encoders[field]
         classes = [cls.lower() for cls in encoder.classes_]
         if value in classes:
             return encoder.transform([encoder.classes_[classes.index(value)]])[0]
-        return 0  # Default if not found
+        return 0  # default
 
     input_data = {
-        "actor_1_name": safe_transform("actor_1_name", actor),
-        "genres": safe_transform("genres", genre),
-        "title_year": int(year)
+        "movie_title": safe_encode("movie_title", title),
+        "actor_1_name": safe_encode("actor_1_name", actor),
+        "genres": safe_encode("genres", genre),
+        "title_year": safe_encode("title_year", year)
     }
 
     df = pd.DataFrame([input_data])
     prediction = model.predict(df)[0]
 
-    # Save to database
+    # Save to DB
     conn = sqlite3.connect("predictions.db")
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO predictions (actor_name, genres, title_year, predicted_rating, timestamp)
-        VALUES (?, ?, ?, ?, ?)
-    """, (actor, genre, year, prediction, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        INSERT INTO predictions (movie_title, actor_name, genre, year, predicted_rating, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (title, actor, genre, year, prediction, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     conn.commit()
     conn.close()
 
