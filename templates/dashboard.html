@@ -1,74 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>📊 Prediction Dashboard</title>
   <style>
     body {
-      background-color: #121212;
+      background-color: #0e0e0e;
+      color: #fff;
       font-family: 'Segoe UI', sans-serif;
-      color: #f1c40f;
-      padding: 30px;
+      padding: 2rem;
     }
     h1 {
+      color: gold;
       text-align: center;
-      color: #f1c40f;
+      margin-bottom: 2rem;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 30px;
+      background: #1e1e1e;
     }
     th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #444;
+      border: 1px solid #444;
+      padding: 0.75rem;
+      text-align: center;
     }
     th {
-      background-color: #1c1c1c;
-      color: #f1c40f;
-    }
-    tr:nth-child(even) {
-      background-color: #1e1e1e;
+      background: #292929;
+      color: gold;
     }
     tr:hover {
-      background-color: #292929;
+      background-color: #333;
     }
     .back-link {
-      text-align: center;
       display: block;
-      margin-top: 30px;
-      color: #f1c40f;
-      text-decoration: none;
-    }
-    .back-link:hover {
+      margin: 1.5rem auto;
+      width: fit-content;
+      text-align: center;
+      color: lightblue;
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>🎬 Prediction Dashboard</h1>
+  <h1>📊 Prediction Dashboard</h1>
   <table>
     <thead>
       <tr>
-        <th>🎞️ Movie Title</th>
-        <th>👤 Actor Name</th>
-        <th>⭐ Predicted Rating</th>
-        <th>🕒 Timestamp</th>
+        <th>ID</th>
+        <th>Actor Name</th>
+        <th>Genres</th>
+        <th>Title Year</th>
+        <th>Predicted Rating</th>
+        <th>Timestamp</th>
       </tr>
     </thead>
     <tbody>
       {% for row in data %}
-        <tr>
-          <td>{{ row.title }}</td>
-          <td>{{ row.actor_name }}</td>
-          <td>{{ row.predicted_rating }}</td>
-          <td>{{ row.timestamp }}</td>
-        </tr>
+      <tr>
+        <td>{{ row['id'] }}</td>
+        <td>{{ row['actor_name'] }}</td>
+        <td>{{ row['genres'] }}</td>
+        <td>{{ row['title_year'] }}</td>
+        <td>{{ row['predicted_rating'] }}</td>
+        <td>{{ row['timestamp'] }}</td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
-  <a href="/" class="back-link">⬅ Back to Prediction</a>
+
+  <a href="/" class="back-link">⬅️ Back to Predictor</a>
 </body>
 </html>

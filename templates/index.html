@@ -1,104 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎥 Movie Rating Predictor</title>
+  <meta charset="UTF-8">
+  <title>🎬 Movie Rating Predictor</title>
   <style>
     body {
-      background-color: #121212;
-      font-family: 'Segoe UI', sans-serif;
-      color: #f1c40f;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .container {
       max-width: 500px;
-      margin: 80px auto;
-      background: #1c1c1c;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-      animation: fadeIn 1s ease-in-out;
+      padding: 2rem;
+      margin-top: 3rem;
+      background: #1e1e1e;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
     }
     h1 {
       text-align: center;
-      color: #f1c40f;
+      color: gold;
+      margin-bottom: 1.5rem;
     }
     label {
-      font-weight: bold;
       display: block;
-      margin: 15px 0 5px;
+      margin-top: 1rem;
+      font-weight: bold;
     }
-    input[type="text"], button {
+    input {
       width: 100%;
-      padding: 10px;
+      padding: 0.5rem;
+      margin-top: 0.2rem;
+      border-radius: 6px;
       border: none;
-      border-radius: 5px;
-      margin-top: 5px;
-      font-size: 16px;
-    }
-    input[type="text"] {
-      background: #2c2c2c;
+      background: #2a2a2a;
       color: #fff;
-    }
-    input[type="text"]:focus {
-      outline: 2px solid #f1c40f;
     }
     button {
-      background-color: #f1c40f;
-      color: #121212;
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.8rem;
+      background: gold;
+      border: none;
+      color: black;
       font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
-      transition: background-color 0.3s ease;
     }
-    button:hover {
-      background-color: #d4ac0d;
-    }
-    .prediction {
+    .result {
+      margin-top: 1.5rem;
       text-align: center;
-      margin-top: 20px;
-      font-size: 20px;
-      color: #fff;
+      font-size: 1.2rem;
+      color: lightgreen;
     }
-    .dashboard-link {
-      display: block;
+    .footer {
+      margin-top: 2rem;
       text-align: center;
-      margin-top: 20px;
-      color: #f1c40f;
-      text-decoration: none;
     }
-    .dashboard-link:hover {
+    a {
+      color: #f1f1f1;
       text-decoration: underline;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-20px);}
-      to {opacity: 1; transform: translateY(0);}
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎬 Movie Predictor</h1>
-    <form method="POST" action="/predict">
-      <label for="movie_title">🎞️ Movie Title</label>
-      <input type="text" id="movie_title" name="movie_title" placeholder="e.g. Inception" required />
+    <h1>🎬 Movie Rating Predictor</h1>
+    <form method="POST" action="/predict" onsubmit="return validateForm()">
+      <label for="actor_name">Lead Actor Name:</label>
+      <input type="text" name="actor_name" id="actor_name" required>
 
-      <label for="actor_name">👤 Lead Actor Name</label>
-      <input type="text" id="actor_name" name="actor_name" placeholder="e.g. Leonardo DiCaprio" required />
+      <label for="genres">Genres:</label>
+      <input type="text" name="genres" id="genres" required placeholder="e.g. Action|Adventure|Sci-Fi">
+
+      <label for="title_year">Release Year:</label>
+      <input type="number" name="title_year" id="title_year" required min="1900" max="2025">
 
       <button type="submit">Predict Rating</button>
     </form>
 
     {% if prediction %}
-      <div class="prediction">
+      <div class="result">
         ⭐ Predicted IMDb Rating: <strong>{{ prediction }}</strong>
       </div>
     {% endif %}
 
-    <a href="/dashboard" class="dashboard-link">📊 View Dashboard</a>
+    <div class="footer">
+      <a href="/dashboard">📊 View Dashboard</a>
+    </div>
   </div>
+
+  <script>
+    function validateForm() {
+      const actor = document.getElementById('actor_name').value.trim();
+      const genres = document.getElementById('genres').value.trim();
+      const year = document.getElementById('title_year').value;
+
+      if (!actor || !genres || !year) {
+        alert("Please fill all the fields.");
+        return false;
+      }
+
+      return true;
+    }
+  </script>
 </body>
 </html>

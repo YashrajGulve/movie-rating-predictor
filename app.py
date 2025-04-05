@@ -18,8 +18,9 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS predictions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT,
             actor_name TEXT,
+            genres TEXT,
+            title_year INTEGER,
             predicted_rating REAL,
             timestamp TEXT
         )
@@ -35,8 +36,9 @@ def index():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    title = request.form["movie_title"]
     actor = request.form["actor_name"]
+    genre = request.form["genres"]
+    year = request.form["title_year"]
 
     # Case-insensitive encoder transform
     def safe_transform(field, value):
@@ -48,8 +50,9 @@ def predict():
         return 0  # Default if not found
 
     input_data = {
-        "movie_title": title,
-        "actor_1_name": safe_transform("actor_1_name", actor)
+        "actor_1_name": safe_transform("actor_1_name", actor),
+        "genres": safe_transform("genres", genre),
+        "title_year": int(year)
     }
 
     df = pd.DataFrame([input_data])
@@ -59,9 +62,9 @@ def predict():
     conn = sqlite3.connect("predictions.db")
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO predictions (title, actor_name, predicted_rating, timestamp)
-        VALUES (?, ?, ?, ?)
-    """, (title, actor, prediction, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        INSERT INTO predictions (actor_name, genres, title_year, predicted_rating, timestamp)
+        VALUES (?, ?, ?, ?, ?)
+    """, (actor, genre, year, prediction, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
     conn.commit()
     conn.close()
 
